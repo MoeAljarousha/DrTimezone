@@ -1,0 +1,404 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap');
+
+/* =========================
+   Global styles
+========================= */
+
+:root {
+    --background: #F5F3EE;
+    --surface: #FFFFFF;
+    --text: #252B2B;
+    --muted: #777B76;
+    --accent: #64877F;
+    --accent-hover: #507268;
+    --border: #D9D7CE;
+    --input-background: #FCFBF9;
+    --error-background: #F9EDEC;
+    --error-text: #A7473D;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    padding: 55px 20px 30px;
+    background-color: var(--background);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+}
+
+/* =========================
+   Header
+========================= */
+
+.title {
+    max-width: 760px;
+    margin: 0 auto 30px;
+}
+
+.title h1 {
+    margin: 0;
+    font-family: 'DM Serif Display', serif;
+    font-size: 42px;
+    font-weight: 400;
+    letter-spacing: -1px;
+    color: var(--text);
+}
+
+.title h1::after {
+    content: ".";
+    color: var(--accent);
+}
+
+.title p {
+    margin: 7px 0 0;
+    color: var(--muted);
+    font-size: 14px;
+    letter-spacing: 0.2px;
+}
+
+/* =========================
+   Main converter
+========================= */
+
+.converter {
+    max-width: 760px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 38px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+}
+
+/* =========================
+   Clock comparison
+========================= */
+
+.clocks {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 25px;
+    padding: 10px 0 32px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--border);
+}
+
+.current-clock-container,
+.new-clock-container {
+    min-width: 0;
+    text-align: center;
+}
+
+.current-clock,
+.new-clock {
+    margin: 0;
+    color: var(--text);
+    font-size: clamp(28px, 5vw, 44px);
+    font-weight: 500;
+    letter-spacing: -1.5px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.current-clock-container p,
+.new-clock-container p {
+    margin: 9px 0 4px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.clock-date {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+#arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    color: var(--accent);
+    font-size: 20px;
+}
+
+/* =========================
+   Form layout
+========================= */
+
+form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    min-width: 0;
+}
+
+.form-group label {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.7px;
+    text-transform: uppercase;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    min-height: 45px;
+    padding: 11px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background-color: var(--input-background);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(100, 135, 127, 0.12);
+}
+
+.field-hint {
+    margin-top: -3px;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+/* =========================
+   Tom Select city search
+========================= */
+
+.ts-wrapper {
+    width: 100%;
+}
+
+.ts-wrapper.single .ts-control {
+    display: flex;
+    align-items: center;
+    min-height: 45px;
+    padding: 0 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--input-background);
+    box-shadow: none;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+}
+
+.ts-wrapper.single .ts-control input {
+    min-height: 42px;
+    padding: 0;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+}
+
+.ts-wrapper.single.focus .ts-control {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(100, 135, 127, 0.12);
+}
+
+.ts-dropdown {
+    z-index: 20;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--surface);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+}
+
+.ts-dropdown .option {
+    padding: 10px 12px;
+}
+
+.ts-dropdown .active {
+    background: #EFEEE9;
+    color: var(--text);
+}
+
+.city-option {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.city-option-name {
+    color: var(--text);
+    font-weight: 600;
+}
+
+.city-option-location {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.ts-dropdown .no-results {
+    padding: 12px;
+    color: var(--muted);
+}
+
+/* =========================
+   Buttons
+========================= */
+
+.form-buttons {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 12px;
+    margin-top: 5px;
+}
+
+button {
+    min-height: 45px;
+    padding: 11px 20px;
+    border: none;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.15s;
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+button[type="submit"] {
+    flex: 1;
+    background-color: var(--accent);
+    color: white;
+}
+
+button[type="submit"]:hover {
+    background-color: var(--accent-hover);
+}
+
+button.CurrentTime {
+    background-color: #EFEEE9;
+    color: var(--text);
+}
+
+button.CurrentTime:hover {
+    background-color: #E5E3DC;
+}
+
+/* =========================
+   Messages and attribution
+========================= */
+
+.error {
+    margin-top: 22px;
+    padding: 13px 15px;
+    border: 1px solid #E8C9C5;
+    border-radius: 6px;
+    background-color: var(--error-background);
+    color: var(--error-text);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.site-footer {
+    max-width: 760px;
+    margin: 18px auto 0;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.site-footer a {
+    color: var(--accent-hover);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+/* =========================
+   Mobile responsiveness
+========================= */
+
+@media (max-width: 600px) {
+    body {
+        padding: 30px 15px;
+    }
+
+    .title {
+        margin-bottom: 24px;
+    }
+
+    .title h1 {
+        font-size: 36px;
+    }
+
+    .converter {
+        padding: 25px 18px;
+    }
+
+    .clocks {
+        gap: 10px;
+        padding-bottom: 25px;
+    }
+
+    .current-clock,
+    .new-clock {
+        font-size: clamp(22px, 6vw, 32px);
+        letter-spacing: -1px;
+    }
+
+    .current-clock-container p,
+    .new-clock-container p {
+        font-size: 12px;
+    }
+
+    #arrow {
+        width: 30px;
+        height: 30px;
+        font-size: 16px;
+    }
+
+    form {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .form-buttons {
+        grid-column: 1;
+    }
+}
+
+@media (max-width: 360px) {
+    .converter {
+        padding: 20px 12px;
+    }
+
+    .clocks {
+        gap: 5px;
+    }
+
+    .current-clock,
+    .new-clock {
+        font-size: 21px;
+    }
+}

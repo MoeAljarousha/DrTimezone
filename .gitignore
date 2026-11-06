@@ -1,0 +1,31 @@
+# Python bytecode and caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment variables and local configuration
+.env
+.env.*
+!.env.example
+
+# Generated GeoNames data and local SQLite databases
+/data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs and coverage output
+*.log
+.coverage
+htmlcov/
+
+# Editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

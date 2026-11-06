@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Convert local times between cities around the world with daylight saving time support.">
+    <title>Dr. Timezone | Time Zone Converter</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/tom-select@2.6.2/dist/css/tom-select.css"
+        rel="stylesheet"
+    >
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.6.2/dist/js/tom-select.complete.min.js" defer></script>
+    <script src="{{ url_for('static', filename='clock.js') }}" defer></script>
+</head>
+
+<body>
+    <header class="title">
+        <h1>Dr. Timezone</h1>
+        <p>Time zone conversion made simple.</p>
+    </header>
+
+    <main class="converter">
+        <section class="clocks" aria-label="Time conversion result">
+            <div class="current-clock-container">
+                {% if oldtime %}
+                    <h2 class="current-clock">{{ oldtime }}</h2>
+                    <p>{{ TZA }}</p>
+                    <span class="clock-date">{{ date0 }}</span>
+                {% else %}
+                    <h2 class="current-clock">--:-- --</h2>
+                    <p>Current timezone</p>
+                {% endif %}
+            </div>
+
+            <div id="arrow" aria-hidden="true">
+                <span>→</span>
+            </div>
+
+            <div class="new-clock-container">
+                {% if newtime %}
+                    <h2 class="new-clock">{{ newtime }}</h2>
+                    <p>{{ TZB }}</p>
+                    <span class="clock-date">{{ date1 }}</span>
+                {% else %}
+                    <h2 class="new-clock">--:-- --</h2>
+                    <p>New timezone</p>
+                {% endif %}
+            </div>
+        </section>
+
+        {% if database_error %}
+            <div class="error" role="alert">{{ database_error }}</div>
+        {% endif %}
+
+        <form method="POST" action="/">
+            <div class="form-group">
+                <label for="oldtz">Current City</label>
+                <select id="oldtz" name="old" placeholder="Search for a city..." required>
+                    <option value="">Search for a city...</option>
+                    {% if old_city %}
+                        <option value="{{ old_city.value }}" selected>{{ old_city.label }}</option>
+                    {% endif %}
+                </select>
+                <span class="field-hint">Click to see 4 suggestions, or type at least 2 letters to search all cities.</span>
+            </div>
+
+            <div class="form-group">
+                <label for="newtz">Destination City</label>
+                <select id="newtz" name="new" placeholder="Search for a city..." required>
+                    <option value="">Search for a city...</option>
+                    {% if new_city %}
+                        <option value="{{ new_city.value }}" selected>{{ new_city.label }}</option>
+                    {% endif %}
+                </select>
+                <span class="field-hint">Click to see 4 suggestions, or type at least 2 letters to search all cities.</span>
+            </div>
+
+            <div class="form-group">
+                <label for="currtime">Time</label>
+                <input
+                    type="time"
+                    id="currtime"
+                    name="currtime"
+                    value="{{ time_value }}"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="selected_date">Date</label>
+                <input
+                    type="date"
+                    id="selected_date"
+                    name="selected_date"
+                    value="{{ date_value }}"
+                    min="1900-01-01"
+                    max="2100-12-31"
+                    required
+                >
+            </div>
+
+            <div class="form-buttons">
+                <button type="button" class="CurrentTime" onclick="setCurrentTime()">Now</button>
+                <button type="submit">Convert Time</button>
+            </div>
+        </form>
+
+        {% if error %}
+            <div class="error" role="alert">{{ error }}</div>
+        {% endif %}
+    </main>
+
+    <footer class="site-footer">
+        Place-name and geographical data provided by
+        <a href="https://www.geonames.org/" target="_blank" rel="noopener noreferrer">GeoNames</a>
+        under the <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0 license</a>.
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            if (typeof TomSelect === "undefined") {
+                console.error("Tom Select did not load. Check the CDN connection.");
+                return;
+            }
+
+            function createCitySelect(selector) {
+                return new TomSelect(selector, {
+                    maxItems: 1,
+                    closeAfterSelect: true,
+
+                    onItemAdd: function () {
+                        this.close();
+                        this.blur();
+                    },
+                    
+                    valueField: "value",
+                    labelField: "text",
+                    searchField: ["text", "city", "region", "country", "timezone"],
+                    create: false,
+                    maxOptions: 50,
+                    loadThrottle: 300,
+                    openOnFocus: true,
+                    preload: "focus",
+                    placeholder: "Choose a suggestion or search...",
+                    shouldLoad: function (query) {
+                        return query.length >= 2;
+                    },
+                    load: function (query, callback) {
+                        const url = `/api/cities?q=${encodeURIComponent(query)}`;
+
+                        fetch(url)
+                            .then(function (response) {
+                                if (!response.ok) {
+                                    throw new Error("City search request failed.");
+                                }
+                                return response.json();
+                            })
+                            .then(function (results) {
+                                callback(Array.isArray(results) ? results : []);
+                            })
+                            .catch(function (error) {
+                                console.error(error);
+                                callback();
+                            });
+                    },
+                    render: {
+                        option: function (item, escape) {
+                            const region = item.region
+                                ? `${escape(item.region)}, `
+                                : "";
+
+                            return `
+                                <div class="city-option">
+                                    <span class="city-option-name">${escape(item.city)}</span>
+                                    <span class="city-option-location">${region}${escape(item.country)}</span>
+                                </div>
+                            `;
+                        },
+                        item: function (item, escape) {
+                            return `<div>${escape(item.label || item.text)}</div>`;
+                        },
+                        no_results: function () {
+                            return '<div class="no-results">No matching cities found. Try another spelling.</div>';
+                        }
+                    }
+                });
+            }
+
+            createCitySelect("#oldtz");
+            createCitySelect("#newtz");
+        });
+    </script>
+</body>
+</html>
